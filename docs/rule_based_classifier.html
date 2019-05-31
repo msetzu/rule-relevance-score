@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.5.3" />
+<title>rule_based_classifier API documentation</title>
+<meta name="description" content="" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.name small{font-weight:normal}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title"><code>rule_based_classifier</code> module</h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">import os
+import shutil
+import subprocess
+
+import numpy as np
+import pandas as pd
+
+from collections import defaultdict
+
+
+wdir = &#34;__rbcache__/&#34;
+
+
+def clean():
+    global wdir
+    if os.path.exists(wdir):
+         shutil.rmtree(wdir)
+
+
+class RuleBasedClassifier:
+
+    def __init__(self, alg=&#39;CPAR&#39;, options=&#39;-Xmx4G&#39;):
+        if alg != &#39;CPAR&#39; and alg != &#39;FOIL&#39;:
+            raise ValueError(&#34;Algorithm must be &#39;CPAR&#39; or &#39;FOIL&#39;&#34;)
+
+        global wdir
+        if not os.path.exists(wdir):
+            os.mkdir(wdir)
+        self.alg = alg
+        self.name = wdir + &#39;_{}_{}&#39;.format(alg, id(self))
+        self.options = options
+        self.rules = None
+        self.class_value_counts = None
+
+    def fit(self, X=None, y=None, deletefile=True, verbose=True, **kwargs):
+        if X is None:
+            raise Exception(&#39;RuleBasedClassifier: no data given to fit&#39;)
+        if y is None:
+            raise Exception(&#39;RuleBasedClassifier: no class given to fit&#39;)
+
+        class_value, counts = np.unique(y, return_counts=True)
+        self.class_value_counts = {k: v for k, v in zip(class_value, counts)}
+
+        # Update
+        filename = self.name + &#39;.data&#39;
+        nbr_classes = len(np.unique(y))
+        cmd = None
+
+        if self.alg == &#39;CPAR&#39;:
+            params = {&#39;delta&#39;: 0.05, &#39;alpha&#39;: 0.3, &#39;gain_similarity_ratio&#39;: 0.99, &#39;min_gain_thr&#39;: 0.7}
+            for k in params:
+                if k in kwargs:
+                    params[k] = kwargs[k]
+            cmd = &#39;java %s -cp %s CPAR -f %s -n %s -w %s -d %s -s %s -g %s&#39; % (self.options, &#39;jrbc&#39;,
+                                                                                 filename, nbr_classes, params[&#39;delta&#39;], params[&#39;alpha&#39;], params[&#39;gain_similarity_ratio&#39;],
+                                                                                 params[&#39;min_gain_thr&#39;])
+
+        if self.alg == &#39;FOIL&#39;:
+            params = {&#39;max_attr_antecedent&#39;: 3, &#39;min_gain_thr&#39;: 0.7}
+            for k in params:
+                if k in kwargs:
+                    params[k] = kwargs[k]
+            cmd = &#39;java %s -cp jrbc FOIL -f %s -n %s -m %s -g %s&#39; % (self.options,
+                                                                     filename, nbr_classes, params[&#39;max_attr_antecedent&#39;], params[&#39;min_gain_thr&#39;])
+
+        df = pd.DataFrame(data=np.column_stack((X, y)))
+        df.to_csv(filename, sep=&#39; &#39;, header=False, index=False)
+
+        col_values = dict()
+        val_column = dict()
+        for i in range(0, X.shape[1]):
+            col_values[i] = np.unique(X[:, i])
+            for v in col_values[i]:
+                val_column[v] = i
+        # for i in range(0, df.shape[1]):
+        #     col_values[i] = np.unique(df[i].values)
+        #     for v in col_values[i]:
+        #         val_column[v] = i
+
+        if verbose:
+            print(cmd)
+        output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
+
+        # if deletefile and os.path.exists(filename):
+        #     os.remove(filename)
+        # os.chdir(&#39;../../../..&#39;)
+
+        self.rules = list()
+        for output_rule in output.decode(&#39;UTF-8&#39;).split(&#39;\n&#39;):
+            output_rule_fields = output_rule.split(&#39;;&#39;) # class, encoded_int value,
+            if len(output_rule_fields) &lt; 3:
+                continue
+            cons = int(output_rule_fields[0])
+            ant = {val_column[int(v)]: int(v) for v in output_rule_fields[1].split(&#39;,&#39;)}
+            laplace = float(output_rule_fields[2])
+
+            rule = tuple([cons, ant, laplace])
+            if rule not in self.rules:
+                self.rules.append(rule)
+
+        return self
+
+    def predict(self, X, k=5):
+        y = list()
+        for x in X:
+            y.append(self.predict_record(x, k))
+        y = np.array(y)
+        return y
+
+    def predict_record(self, x, k=5):
+        satisfied = self.__get_rules_satisfied(x)
+        if len(satisfied) == 0:
+            return max(self.class_value_counts, key=self.class_value_counts.get)
+
+        cons_score = dict()
+        for cons in satisfied:
+            bestrules = sorted(satisfied[cons], key=lambda rule: rule[2], reverse=True)[:k]
+            laccuray = [rule[2] for rule in bestrules]
+            cons_score[cons] = 0.0 if len(laccuray) == 0 else np.mean(laccuray)
+
+        return max(cons_score, key=cons_score.get)
+
+    def __get_rules_satisfied(self, x):
+        satisfied = defaultdict(list)
+        for rule in self.rules:
+            cons, ant, laplace = rule
+            is_satisfied = True
+            for col, val in ant.items():
+                if x[col] != val:
+                    is_satisfied = False
+                    break
+            if is_satisfied:
+                satisfied[cons].append(rule)
+        return satisfied</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="rule_based_classifier.clean"><code class="name flex">
+<span>def <span class="ident">clean</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def clean():
+    global wdir
+    if os.path.exists(wdir):
+         shutil.rmtree(wdir)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="rule_based_classifier.RuleBasedClassifier"><code class="flex name class">
+<span>class <span class="ident">RuleBasedClassifier</span></span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">class RuleBasedClassifier:
+
+    def __init__(self, alg=&#39;CPAR&#39;, options=&#39;-Xmx4G&#39;):
+        if alg != &#39;CPAR&#39; and alg != &#39;FOIL&#39;:
+            raise ValueError(&#34;Algorithm must be &#39;CPAR&#39; or &#39;FOIL&#39;&#34;)
+
+        global wdir
+        if not os.path.exists(wdir):
+            os.mkdir(wdir)
+        self.alg = alg
+        self.name = wdir + &#39;_{}_{}&#39;.format(alg, id(self))
+        self.options = options
+        self.rules = None
+        self.class_value_counts = None
+
+    def fit(self, X=None, y=None, deletefile=True, verbose=True, **kwargs):
+        if X is None:
+            raise Exception(&#39;RuleBasedClassifier: no data given to fit&#39;)
+        if y is None:
+            raise Exception(&#39;RuleBasedClassifier: no class given to fit&#39;)
+
+        class_value, counts = np.unique(y, return_counts=True)
+        self.class_value_counts = {k: v for k, v in zip(class_value, counts)}
+
+        # Update
+        filename = self.name + &#39;.data&#39;
+        nbr_classes = len(np.unique(y))
+        cmd = None
+
+        if self.alg == &#39;CPAR&#39;:
+            params = {&#39;delta&#39;: 0.05, &#39;alpha&#39;: 0.3, &#39;gain_similarity_ratio&#39;: 0.99, &#39;min_gain_thr&#39;: 0.7}
+            for k in params:
+                if k in kwargs:
+                    params[k] = kwargs[k]
+            cmd = &#39;java %s -cp %s CPAR -f %s -n %s -w %s -d %s -s %s -g %s&#39; % (self.options, &#39;jrbc&#39;,
+                                                                                 filename, nbr_classes, params[&#39;delta&#39;], params[&#39;alpha&#39;], params[&#39;gain_similarity_ratio&#39;],
+                                                                                 params[&#39;min_gain_thr&#39;])
+
+        if self.alg == &#39;FOIL&#39;:
+            params = {&#39;max_attr_antecedent&#39;: 3, &#39;min_gain_thr&#39;: 0.7}
+            for k in params:
+                if k in kwargs:
+                    params[k] = kwargs[k]
+            cmd = &#39;java %s -cp jrbc FOIL -f %s -n %s -m %s -g %s&#39; % (self.options,
+                                                                     filename, nbr_classes, params[&#39;max_attr_antecedent&#39;], params[&#39;min_gain_thr&#39;])
+
+        df = pd.DataFrame(data=np.column_stack((X, y)))
+        df.to_csv(filename, sep=&#39; &#39;, header=False, index=False)
+
+        col_values = dict()
+        val_column = dict()
+        for i in range(0, X.shape[1]):
+            col_values[i] = np.unique(X[:, i])
+            for v in col_values[i]:
+                val_column[v] = i
+        # for i in range(0, df.shape[1]):
+        #     col_values[i] = np.unique(df[i].values)
+        #     for v in col_values[i]:
+        #         val_column[v] = i
+
+        if verbose:
+            print(cmd)
+        output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
+
+        # if deletefile and os.path.exists(filename):
+        #     os.remove(filename)
+        # os.chdir(&#39;../../../..&#39;)
+
+        self.rules = list()
+        for output_rule in output.decode(&#39;UTF-8&#39;).split(&#39;\n&#39;):
+            output_rule_fields = output_rule.split(&#39;;&#39;) # class, encoded_int value,
+            if len(output_rule_fields) &lt; 3:
+                continue
+            cons = int(output_rule_fields[0])
+            ant = {val_column[int(v)]: int(v) for v in output_rule_fields[1].split(&#39;,&#39;)}
+            laplace = float(output_rule_fields[2])
+
+            rule = tuple([cons, ant, laplace])
+            if rule not in self.rules:
+                self.rules.append(rule)
+
+        return self
+
+    def predict(self, X, k=5):
+        y = list()
+        for x in X:
+            y.append(self.predict_record(x, k))
+        y = np.array(y)
+        return y
+
+    def predict_record(self, x, k=5):
+        satisfied = self.__get_rules_satisfied(x)
+        if len(satisfied) == 0:
+            return max(self.class_value_counts, key=self.class_value_counts.get)
+
+        cons_score = dict()
+        for cons in satisfied:
+            bestrules = sorted(satisfied[cons], key=lambda rule: rule[2], reverse=True)[:k]
+            laccuray = [rule[2] for rule in bestrules]
+            cons_score[cons] = 0.0 if len(laccuray) == 0 else np.mean(laccuray)
+
+        return max(cons_score, key=cons_score.get)
+
+    def __get_rules_satisfied(self, x):
+        satisfied = defaultdict(list)
+        for rule in self.rules:
+            cons, ant, laplace = rule
+            is_satisfied = True
+            for col, val in ant.items():
+                if x[col] != val:
+                    is_satisfied = False
+                    break
+            if is_satisfied:
+                satisfied[cons].append(rule)
+        return satisfied</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="rule_based_classifier.RuleBasedClassifier.__init__"><code class="name flex">
+<span>def <span class="ident">__init__</span></span>(<span>self, alg=&#39;CPAR&#39;, options=&#39;-Xmx4G&#39;)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Initialize self.
+See help(type(self)) for accurate signature.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def __init__(self, alg=&#39;CPAR&#39;, options=&#39;-Xmx4G&#39;):
+    if alg != &#39;CPAR&#39; and alg != &#39;FOIL&#39;:
+        raise ValueError(&#34;Algorithm must be &#39;CPAR&#39; or &#39;FOIL&#39;&#34;)
+
+    global wdir
+    if not os.path.exists(wdir):
+        os.mkdir(wdir)
+    self.alg = alg
+    self.name = wdir + &#39;_{}_{}&#39;.format(alg, id(self))
+    self.options = options
+    self.rules = None
+    self.class_value_counts = None</code></pre>
+</details>
+</dd>
+<dt id="rule_based_classifier.RuleBasedClassifier.fit"><code class="name flex">
+<span>def <span class="ident">fit</span></span>(<span>self, X=None, y=None, deletefile=True, verbose=True, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def fit(self, X=None, y=None, deletefile=True, verbose=True, **kwargs):
+    if X is None:
+        raise Exception(&#39;RuleBasedClassifier: no data given to fit&#39;)
+    if y is None:
+        raise Exception(&#39;RuleBasedClassifier: no class given to fit&#39;)
+
+    class_value, counts = np.unique(y, return_counts=True)
+    self.class_value_counts = {k: v for k, v in zip(class_value, counts)}
+
+    # Update
+    filename = self.name + &#39;.data&#39;
+    nbr_classes = len(np.unique(y))
+    cmd = None
+
+    if self.alg == &#39;CPAR&#39;:
+        params = {&#39;delta&#39;: 0.05, &#39;alpha&#39;: 0.3, &#39;gain_similarity_ratio&#39;: 0.99, &#39;min_gain_thr&#39;: 0.7}
+        for k in params:
+            if k in kwargs:
+                params[k] = kwargs[k]
+        cmd = &#39;java %s -cp %s CPAR -f %s -n %s -w %s -d %s -s %s -g %s&#39; % (self.options, &#39;jrbc&#39;,
+                                                                             filename, nbr_classes, params[&#39;delta&#39;], params[&#39;alpha&#39;], params[&#39;gain_similarity_ratio&#39;],
+                                                                             params[&#39;min_gain_thr&#39;])
+
+    if self.alg == &#39;FOIL&#39;:
+        params = {&#39;max_attr_antecedent&#39;: 3, &#39;min_gain_thr&#39;: 0.7}
+        for k in params:
+            if k in kwargs:
+                params[k] = kwargs[k]
+        cmd = &#39;java %s -cp jrbc FOIL -f %s -n %s -m %s -g %s&#39; % (self.options,
+                                                                 filename, nbr_classes, params[&#39;max_attr_antecedent&#39;], params[&#39;min_gain_thr&#39;])
+
+    df = pd.DataFrame(data=np.column_stack((X, y)))
+    df.to_csv(filename, sep=&#39; &#39;, header=False, index=False)
+
+    col_values = dict()
+    val_column = dict()
+    for i in range(0, X.shape[1]):
+        col_values[i] = np.unique(X[:, i])
+        for v in col_values[i]:
+            val_column[v] = i
+    # for i in range(0, df.shape[1]):
+    #     col_values[i] = np.unique(df[i].values)
+    #     for v in col_values[i]:
+    #         val_column[v] = i
+
+    if verbose:
+        print(cmd)
+    output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
+
+    # if deletefile and os.path.exists(filename):
+    #     os.remove(filename)
+    # os.chdir(&#39;../../../..&#39;)
+
+    self.rules = list()
+    for output_rule in output.decode(&#39;UTF-8&#39;).split(&#39;\n&#39;):
+        output_rule_fields = output_rule.split(&#39;;&#39;) # class, encoded_int value,
+        if len(output_rule_fields) &lt; 3:
+            continue
+        cons = int(output_rule_fields[0])
+        ant = {val_column[int(v)]: int(v) for v in output_rule_fields[1].split(&#39;,&#39;)}
+        laplace = float(output_rule_fields[2])
+
+        rule = tuple([cons, ant, laplace])
+        if rule not in self.rules:
+            self.rules.append(rule)
+
+    return self</code></pre>
+</details>
+</dd>
+<dt id="rule_based_classifier.RuleBasedClassifier.predict"><code class="name flex">
+<span>def <span class="ident">predict</span></span>(<span>self, X, k=5)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def predict(self, X, k=5):
+    y = list()
+    for x in X:
+        y.append(self.predict_record(x, k))
+    y = np.array(y)
+    return y</code></pre>
+</details>
+</dd>
+<dt id="rule_based_classifier.RuleBasedClassifier.predict_record"><code class="name flex">
+<span>def <span class="ident">predict_record</span></span>(<span>self, x, k=5)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def predict_record(self, x, k=5):
+    satisfied = self.__get_rules_satisfied(x)
+    if len(satisfied) == 0:
+        return max(self.class_value_counts, key=self.class_value_counts.get)
+
+    cons_score = dict()
+    for cons in satisfied:
+        bestrules = sorted(satisfied[cons], key=lambda rule: rule[2], reverse=True)[:k]
+        laccuray = [rule[2] for rule in bestrules]
+        cons_score[cons] = 0.0 if len(laccuray) == 0 else np.mean(laccuray)
+
+    return max(cons_score, key=cons_score.get)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="rule_based_classifier.clean" href="#rule_based_classifier.clean">clean</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="rule_based_classifier.RuleBasedClassifier" href="#rule_based_classifier.RuleBasedClassifier">RuleBasedClassifier</a></code></h4>
+<ul class="">
+<li><code><a title="rule_based_classifier.RuleBasedClassifier.__init__" href="#rule_based_classifier.RuleBasedClassifier.__init__">__init__</a></code></li>
+<li><code><a title="rule_based_classifier.RuleBasedClassifier.fit" href="#rule_based_classifier.RuleBasedClassifier.fit">fit</a></code></li>
+<li><code><a title="rule_based_classifier.RuleBasedClassifier.predict" href="#rule_based_classifier.RuleBasedClassifier.predict">predict</a></code></li>
+<li><code><a title="rule_based_classifier.RuleBasedClassifier.predict_record" href="#rule_based_classifier.RuleBasedClassifier.predict_record">predict_record</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.5.3</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>
