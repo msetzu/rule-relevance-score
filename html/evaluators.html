@@ -1,0 +1,1394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.1" />
+<title>evaluators API documentation</title>
+<meta name="description" content="Evaluation module providing basic metrics to run and analyze GLocalX&#39;s results.
+Two evaluators are provided, DummyEvaluator, which does not optimize …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>evaluators</code></h1>
+</header>
+<section id="section-intro">
+<p>Evaluation module providing basic metrics to run and analyze GLocalX's results.
+Two evaluators are provided, DummyEvaluator, which does not optimize performance,
+and MemEvaluator, which stores previously computed measures to speed-up performance.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Evaluation module providing basic metrics to run and analyze GLocalX&#39;s results.
+Two evaluators are provided, DummyEvaluator, which does not optimize performance,
+and MemEvaluator, which stores previously computed measures to speed-up performance.
+&#34;&#34;&#34;
+from abc import abstractmethod
+from statistics import harmonic_mean
+
+import numpy as np
+from scipy.spatial.distance import hamming
+
+from models import Rule
+
+
+def covers(rule, x):
+    &#34;&#34;&#34;Does `rule` cover c?
+
+    Args:
+        rule (Rule): The rule.
+        x (numpy.np.array): The record.
+    Returns:
+        bool: True if this rule covers c, False otherwise.
+    &#34;&#34;&#34;
+    return all([(x[feature] &gt;= lower) &amp; (x[feature] &lt; upper)] for feature, (lower, upper) in rule)
+
+
+def binary_fidelity(rule, x, y, evaluator=None, ids=None, default=np.nan):
+    &#34;&#34;&#34;Evaluate the goodness of unit.
+    Args:
+        rule (Rule): The unit to evaluate.
+        x (np.array): The data.
+        y (np.array): The labels.
+        evaluator (Evaluator): Optional evaluator to speed-up computation.
+        ids (np.array): Unique identifiers to tell each element in @patterns apart.
+        default (int): Default prediction for records not covered by the unit.
+    Returns:
+          float: The unit&#39;s fidelity_weight
+    &#34;&#34;&#34;
+    coverage = evaluator.coverage([rule], x, ids=ids).flatten()
+    unit_predictions = np.array([rule.consequence for _ in range(x.shape[0] if ids is None else ids.shape[0])]).flatten()
+    unit_predictions[~coverage] = default
+
+    fidelity = 1 - hamming(unit_predictions, y[ids] if ids is not None else y) if len(y) &gt; 0 else 0
+
+    return fidelity
+
+
+def coverage_size(rule, x):
+    &#34;&#34;&#34;Evaluate the cardinality of the coverage of unit on c.
+
+    Args:
+        rule (Rule): The rule.
+        x (np.array): The validation set.
+
+    Returns:
+        (int: Number of records of X covered by rule.
+    &#34;&#34;&#34;
+    return coverage_matrix([rule], x).sum().item(0)
+
+
+def coverage_matrix(rules, x, y=None, ids=None):
+    &#34;&#34;&#34;Compute the coverage of @rules over @patterns.
+    Args:
+        rules (Union(list, Rule)): List of rules (or single Rule) whose coverage to compute.
+        x (np.array): The validation set.
+        y (np.array): The labels, if any. None otherwise. Defaults to None.
+        ids (np.array): Unique identifiers to tell each element in `x` apart.
+    Returns:
+        numpy.ndnp.array: The coverage matrix.
+    &#34;&#34;&#34;
+    def premises_from(rule, include_labels=False):
+        if not include_labels:
+            premises = np.logical_and.reduce([[(x[:, feature] &gt; lower) &amp; (x[:, feature] &lt;= upper)]
+                                              for feature, (lower, upper) in rule]).squeeze()
+        else:
+            premises = np.logical_and.reduce([(x[:, feature] &gt; lower) &amp; (x[:, feature] &lt;= upper)
+                                              &amp; (y == rule.consequence)
+                                              for feature, (lower, upper) in rule]).squeeze()
+
+        premises = np.argwhere(premises).squeeze()
+
+        return premises
+
+    if isinstance(rules, Rule):
+        coverage_matrix_ = np.full((len(x)), False)
+        hit_columns = [premises_from(rules, y is not None)]
+        coverage_matrix_[tuple(hit_columns)] = True
+    else:
+        coverage_matrix_ = np.full((len(rules), len(x)), False)
+        hit_columns = [premises_from(rule, y is not None) for rule in rules]
+
+        for k, hits in zip(range(len(x)), hit_columns):
+            coverage_matrix_[k, hits] = True
+
+    coverage_matrix_ = coverage_matrix_[:, ids] if ids is not None else coverage_matrix_
+
+    return coverage_matrix_
+
+
+class Evaluator:
+    &#34;&#34;&#34;Evaluator interface. Evaluator objects provide coverage and fidelity_weight utilities.&#34;&#34;&#34;
+
+    @abstractmethod
+    def coverage(self, rules, patterns, target=None, ids=None):
+        &#34;&#34;&#34;Compute the coverage of @rules over @patterns.
+        Args:
+            rules (list) or (Rule):
+            patterns (np.array): The validation set.
+            target (np.array): The labels, if any. None otherwise. Defaults to None.
+            ids (np.array): Unique identifiers to tell each element in @patterns apart.
+        Returns:
+            numpy.array: The coverage matrix.
+        &#34;&#34;&#34;
+        pass
+
+    @abstractmethod
+    def coverage_size(self, rule, x, ids=None):
+        &#34;&#34;&#34;Evaluate the cardinality of the coverage of unit on c.
+
+        Args:
+            rule (Rule): The rule.
+            x (np.array): The validation set.
+            ids (np.array): Unique identifiers to tell each element in @patterns apart.
+        Returns:
+            int: Number of records of X covered by rule.
+        &#34;&#34;&#34;
+        pass
+
+    @abstractmethod
+    def binary_fidelity(self, unit, x, y, ids=None, default=np.nan):
+        &#34;&#34;&#34;Evaluate the goodness of unit.
+        Args:
+            unit (Unit): The unit to evaluate.
+            x (np.array): The data.
+            y (np.array): The labels.
+            ids (np.array): Unique identifiers to tell each element in @patterns apart.
+            default (int): Default prediction when no rule covers a record.
+        Returns:
+              float: The unit&#39;s fidelity_weight
+        &#34;&#34;&#34;
+        pass
+
+    @abstractmethod
+    def binary_fidelity_model(self, rules, scores, x, y, x_vl, y_vl, default=None, ids=None):
+        &#34;&#34;&#34;Evaluate the goodness of the `units`.
+        Args:
+            rules (Union(list, set)): The units to evaluate.
+            scores (np.array): The scores.
+            x (np.array): The training data.
+            y (np.array): The training labels.
+            x_vl (np.array): The data.
+            y_vl (np.array): The labels.
+            default (int): Default prediction for records not covered by the unit.
+            ids (np.array): Unique identifiers to tell each element in @c apart.
+        Returns:
+            float: The units fidelity_weight.
+        &#34;&#34;&#34;
+        pass
+
+    @abstractmethod
+    def covers(self, rule, x):
+        &#34;&#34;&#34;Does @rule cover c?
+
+        Args:
+            rule (Rule): The rule.
+            x (np.array): The record.
+        Returns:
+            bool: True if this rule covers c, False otherwise.
+        &#34;&#34;&#34;
+        pass
+
+
+class MemEvaluator(Evaluator):
+    &#34;&#34;&#34;Memoization-aware Evaluator to avoid evaluating the same measures over the same data.&#34;&#34;&#34;
+
+    def __init__(self, oracle):
+        &#34;&#34;&#34;Constructor.&#34;&#34;&#34;
+        self.oracle = oracle
+        self.coverages = dict()
+        self.binary_fidelities = dict()
+        self.coverage_sizes = dict()
+        self.scores = dict()
+
+    @abstractmethod
+    def covers(self, rule, x):
+        &#34;&#34;&#34;Does @rule cover c?
+
+        Args:
+            rule (Rule): The rule.
+            x (np.array): The record.
+        Returns:
+            bool: True if this rule covers c, False otherwise.
+        &#34;&#34;&#34;
+        return covers(rule, x)
+
+    def coverage(self, rules, x, y=None, ids=None):
+        &#34;&#34;&#34;Compute the coverage of @rules over @patterns.
+        Args:
+            rules (Union(Rule, list): Rule (or list of rules) whose coverage to compute.
+            x (np.array): The validation set.
+            y (np.array): The labels, if any. None otherwise. Defaults to None.
+            ids (np.array): IDS of the given `patterns`, used to speed up evaluation.
+        Returns:
+            numpy.np.array: The coverage matrix.
+        &#34;&#34;&#34;
+        for rule in rules:
+            if rule not in self.coverages:
+                self.coverages[rule] = coverage_matrix(rule, x, y)
+        cov = np.array([self.coverages[rule] for rule in rules])
+        cov = cov[:, ids] if ids is not None else cov
+
+        return cov
+
+    def binary_fidelity(self, unit, x, y, default=np.nan, ids=None):
+        &#34;&#34;&#34;Evaluate the goodness of unit.
+        Args:
+            unit (Unit): The unit to evaluate.
+            x (np.array): The data.
+            y (np.array): The labels.
+            default (int): Default prediction for records not covered by the unit.
+            ids (np.array): IDS of the given `x`, used to speed up evaluation.
+        Returns:
+              float: The unit&#39;s fidelity_weight
+        &#34;&#34;&#34;
+        if y is None:
+            y = self.oracle.predict(x).round().squeeze()
+
+        if ids is None:
+            self.binary_fidelities[unit] = self.binary_fidelities.get(unit, binary_fidelity(unit, x, y, self,
+                                                                                            default=default, ids=None))
+            fidelity = self.binary_fidelities[unit]
+        else:
+            fidelity = binary_fidelity(unit, x, y, self, default=default, ids=ids)
+
+        return fidelity
+
+    def binary_fidelity_model(self, rules, scores, x, y, x_vl, y_vl, default=None, ids=None):
+        &#34;&#34;&#34;Evaluate the goodness of unit.
+        Args:
+            rules (np.array): The units to evaluate.
+            scores (np.array): The scores.
+            x (np.array): The data.
+            y (np.array): The labels.
+            x_vl (np.array): The validation data.
+            y_vl (np.array): The validation labels.
+            default (int): Default prediction for records not covered by the unit.
+            ids (np.array): Unique identifiers to tell each element in @patterns apart.
+        Returns:
+              (float): The units fidelity.
+        &#34;&#34;&#34;
+        if self.oracle is not None:
+            y_vl = self.oracle.predict(x_vl).round().squeeze()
+
+        coverage = self.coverage(rules, x_vl, y_vl)
+
+        predictions = []
+        for record in range(len(x_vl)):
+            companions = scores[coverage[:, record]]
+            companion_units = [rules[i] for i in coverage[:, record]]
+            top_companions = np.argsort(companions)[-1:]
+            top_units = [companion_units[i] for i in top_companions]
+            top_fidelities = companions[top_companions]
+            top_fidelities_0 = [top_fidelity for top_fidelity, top_unit in zip(top_fidelities, top_units)
+                                if top_unit.consequence == 0]
+            top_fidelities_1 = [top_fidelity for top_fidelity, top_unit in zip(top_fidelities, top_units)
+                                if top_unit.consequence == 1]
+
+            if len(top_fidelities_0) == 0 and len(top_fidelities_1) &gt; 0:
+                prediction = 1
+            elif len(top_fidelities_0) &gt; 0 and len(top_fidelities_1) == 0:
+                prediction = 0
+            elif len(top_fidelities_0) == 0 and len(top_fidelities_1) == 0:
+                prediction = default
+            else:
+                prediction = 0 if np.mean(top_fidelities_0) &gt; np.mean(top_fidelities_1) else 1
+
+            predictions.append(prediction)
+        predictions = np.array(predictions)
+        fidelity = 1 - hamming(predictions, y_vl) if len(y_vl) &gt; 0 else 0
+
+        return fidelity
+
+
+########################
+# Framework validation #
+########################
+def validate(rules, scores, oracle, vl, scoring=&#39;rrs&#39;, evaluator=None, alpha=0, beta=0, gamma=-1, max_len=np.inf):
+    &#34;&#34;&#34;Validate the given rules in the given ruleset.
+    Arguments:
+        rules (iterable): Iterable of rules to validate.
+        scores(iterable): The scores.
+        oracle (Predictor): Oracle to validate against.
+        vl (np.array): Validation set.
+        scoring (str): Scoring function used.
+        evaluator (Evaluator): Evaluator.
+        alpha (float): Pruning hyperparameter, rules with score less than `alpha` are removed from the ruleset used to
+                        perform the validation.
+        beta (float): Pruning hyperparameter, rules with score less than the `beta`-percentile are removed from the
+                        result.
+        gamma (int): Maximum number of rules to use.
+        max_len (int): Pruning hyperparameter, rules with length
+                        more than `max_len` are removed from the
+                        ruleset used to perform the validation.
+    Returns:
+        (dict): Dictionary of validation measures.
+    &#34;&#34;&#34;
+    def mean_len(rules):
+        return np.mean([len(r) for r in rules])
+
+    def std_len(rules):
+        return np.std([len(r) for r in rules])
+
+    def len_reduction(ruleset_a, ruleset_b):
+        return ruleset_a / ruleset_b
+
+    def simplicity(ruleset_a, ruleset_b):
+        return ruleset_a * ruleset_b
+
+    def features_frequencies(rules, features):
+        return [sum([1 if f in r else 0 for r in rules]) for f in features]
+
+    def coverage_pct(rules, x):
+        coverage = coverage_matrix(rules, x)
+        coverage_percentage = (coverage.sum(axis=0) &gt; 0).sum() / x.shape[0]
+
+        return coverage_percentage
+
+    if evaluator is None:
+        evaluator = MemEvaluator(oracle=oracle)
+    if oracle is None:
+        x = vl[:, :-1]
+        y = vl[:, -1]
+    else:
+        x = vl[:, :-1]
+        y = oracle.predict(x).round().squeeze()
+
+    # Prune rules according to score and maximum length
+    majority_label = round(y.sum() / len(y))
+    n = len(rules)
+
+    beta_value = np.percentile(scores, beta)
+    beta_score_idx = [i for i in range(n) if scores[i] &gt;= beta_value and len(rules[i]) &lt;= max_len][:gamma]
+    beta_rules = [rules[i] for i in beta_score_idx]
+    beta_rules_nr = len(beta_rules)
+
+    alpha_score_idx = [i for i in range(n) if scores[i] &gt;= alpha and len(rules[i]) &lt;= max_len][:gamma]
+    alpha_rules = [rules[i] for i in alpha_score_idx]
+
+    validation = dict()
+    validation[&#39;alpha&#39;]     = alpha
+    validation[&#39;beta&#39;]      = beta
+    validation[&#39;gamma&#39;]     = gamma
+    validation[&#39;max_len&#39;]   = max_len
+    validation[&#39;scoring&#39;]   = scoring
+
+    scoring_fidelities = evaluator.binary_fidelity_model(alpha_rules, scores=scores,
+                                                                x=x, y=y, x_vl=x, y_vl=y,
+                                                                default=majority_label)
+    beta_scoring_fidelities = evaluator.binary_fidelity_model(beta_rules,
+                                                               scores=scores[beta_score_idx],
+                                                               x=x, y=y, x_vl=x, y_vl=y,
+                                                               default=majority_label)
+
+    validation[&#39;scoring-fidelities&#39;] = scoring_fidelities
+    validation[&#39;beta-scoring-fidelity&#39;] = beta_scoring_fidelities
+    validation[&#39;beta-scoring-rule_nr&#39;] = beta_rules_nr
+    validation[&#39;mean_length&#39;] = mean_len(rules)
+    validation[&#39;std_length&#39;] = std_len(rules)
+
+    validation[&#39;coverage&#39;] = coverage_pct(rules, x)
+    validation[&#39;beta-scoring-coverage&#39;] = coverage_pct(beta_rules, x)
+    validation[&#39;mean-beta-scoring-length&#39;] = mean_len(beta_rules)
+    validation[&#39;std-beta-scoring-length&#39;] = std_len(beta_rules)
+
+    # Predictions
+    validation[&#39;mean_prediction&#39;] = np.mean([r.consequence for r in rules])
+    validation[&#39;std-scoring-prediction&#39;] = np.std([r.consequence for r in alpha_rules])
+    validation[&#39;rule_reduction-alpha-scoring&#39;] = len(alpha_rules) / len(rules)
+    validation[&#39;rule_reduction-beta-scoring&#39;] = len(beta_rules) / len(rules)
+    validation[&#39;len_reduction-beta-scoring&#39;] = len_reduction(validation[&#39;mean-beta-scoring-length&#39;],
+                                                             validation[&#39;mean_length&#39;])
+    validation[&#39;simplicity-beta-scoring&#39;] = simplicity(validation[&#39;rule_reduction-beta-scoring&#39;],
+                                                       validation[&#39;len_reduction-beta-scoring&#39;])
+    features = rules[0].names
+    validation[&#39;feature_frequency&#39;]                 = features_frequencies(rules, features)
+    validation[&#39;scoring-beta-feature_frequency&#39;]    = features_frequencies(beta_rules, features)
+
+    validation[&#39;scoring-beta-escore&#39;] = harmonic_mean([validation[&#39;beta-scoring-fidelity&#39;],
+                                                        validation[&#39;simplicity-beta-scoring&#39;]])
+
+    return validation</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="evaluators.binary_fidelity"><code class="name flex">
+<span>def <span class="ident">binary_fidelity</span></span>(<span>rule, x, y, evaluator=None, ids=None, default=nan)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Evaluate the goodness of unit.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>rule</code></strong> :&ensp;<code>Rule</code></dt>
+<dd>The unit to evaluate.</dd>
+<dt><strong><code>x</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The data.</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The labels.</dd>
+<dt><strong><code>evaluator</code></strong> :&ensp;<code><a title="evaluators.Evaluator" href="#evaluators.Evaluator">Evaluator</a></code></dt>
+<dd>Optional evaluator to speed-up computation.</dd>
+<dt><strong><code>ids</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>Unique identifiers to tell each element in @patterns apart.</dd>
+<dt><strong><code>default</code></strong> :&ensp;<code>int</code></dt>
+<dd>Default prediction for records not covered by the unit.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>float</code></dt>
+<dd>The unit's fidelity_weight</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def binary_fidelity(rule, x, y, evaluator=None, ids=None, default=np.nan):
+    &#34;&#34;&#34;Evaluate the goodness of unit.
+    Args:
+        rule (Rule): The unit to evaluate.
+        x (np.array): The data.
+        y (np.array): The labels.
+        evaluator (Evaluator): Optional evaluator to speed-up computation.
+        ids (np.array): Unique identifiers to tell each element in @patterns apart.
+        default (int): Default prediction for records not covered by the unit.
+    Returns:
+          float: The unit&#39;s fidelity_weight
+    &#34;&#34;&#34;
+    coverage = evaluator.coverage([rule], x, ids=ids).flatten()
+    unit_predictions = np.array([rule.consequence for _ in range(x.shape[0] if ids is None else ids.shape[0])]).flatten()
+    unit_predictions[~coverage] = default
+
+    fidelity = 1 - hamming(unit_predictions, y[ids] if ids is not None else y) if len(y) &gt; 0 else 0
+
+    return fidelity</code></pre>
+</details>
+</dd>
+<dt id="evaluators.coverage_matrix"><code class="name flex">
+<span>def <span class="ident">coverage_matrix</span></span>(<span>rules, x, y=None, ids=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the coverage of @rules over @patterns.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt>rules (Union(list, Rule)): List of rules (or single Rule) whose coverage to compute.</dt>
+<dt><strong><code>x</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The validation set.</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The labels, if any. None otherwise. Defaults to None.</dd>
+<dt><strong><code>ids</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>Unique identifiers to tell each element in <code>x</code> apart.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>numpy.ndnp.array</code></dt>
+<dd>The coverage matrix.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def coverage_matrix(rules, x, y=None, ids=None):
+    &#34;&#34;&#34;Compute the coverage of @rules over @patterns.
+    Args:
+        rules (Union(list, Rule)): List of rules (or single Rule) whose coverage to compute.
+        x (np.array): The validation set.
+        y (np.array): The labels, if any. None otherwise. Defaults to None.
+        ids (np.array): Unique identifiers to tell each element in `x` apart.
+    Returns:
+        numpy.ndnp.array: The coverage matrix.
+    &#34;&#34;&#34;
+    def premises_from(rule, include_labels=False):
+        if not include_labels:
+            premises = np.logical_and.reduce([[(x[:, feature] &gt; lower) &amp; (x[:, feature] &lt;= upper)]
+                                              for feature, (lower, upper) in rule]).squeeze()
+        else:
+            premises = np.logical_and.reduce([(x[:, feature] &gt; lower) &amp; (x[:, feature] &lt;= upper)
+                                              &amp; (y == rule.consequence)
+                                              for feature, (lower, upper) in rule]).squeeze()
+
+        premises = np.argwhere(premises).squeeze()
+
+        return premises
+
+    if isinstance(rules, Rule):
+        coverage_matrix_ = np.full((len(x)), False)
+        hit_columns = [premises_from(rules, y is not None)]
+        coverage_matrix_[tuple(hit_columns)] = True
+    else:
+        coverage_matrix_ = np.full((len(rules), len(x)), False)
+        hit_columns = [premises_from(rule, y is not None) for rule in rules]
+
+        for k, hits in zip(range(len(x)), hit_columns):
+            coverage_matrix_[k, hits] = True
+
+    coverage_matrix_ = coverage_matrix_[:, ids] if ids is not None else coverage_matrix_
+
+    return coverage_matrix_</code></pre>
+</details>
+</dd>
+<dt id="evaluators.coverage_size"><code class="name flex">
+<span>def <span class="ident">coverage_size</span></span>(<span>rule, x)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Evaluate the cardinality of the coverage of unit on c.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>rule</code></strong> :&ensp;<code>Rule</code></dt>
+<dd>The rule.</dd>
+<dt><strong><code>x</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The validation set.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>(int: Number of records of X covered by rule.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def coverage_size(rule, x):
+    &#34;&#34;&#34;Evaluate the cardinality of the coverage of unit on c.
+
+    Args:
+        rule (Rule): The rule.
+        x (np.array): The validation set.
+
+    Returns:
+        (int: Number of records of X covered by rule.
+    &#34;&#34;&#34;
+    return coverage_matrix([rule], x).sum().item(0)</code></pre>
+</details>
+</dd>
+<dt id="evaluators.covers"><code class="name flex">
+<span>def <span class="ident">covers</span></span>(<span>rule, x)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Does <code>rule</code> cover c?</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>rule</code></strong> :&ensp;<code>Rule</code></dt>
+<dd>The rule.</dd>
+<dt><strong><code>x</code></strong> :&ensp;<code>numpy.np.array</code></dt>
+<dd>The record.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>True if this rule covers c, False otherwise.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def covers(rule, x):
+    &#34;&#34;&#34;Does `rule` cover c?
+
+    Args:
+        rule (Rule): The rule.
+        x (numpy.np.array): The record.
+    Returns:
+        bool: True if this rule covers c, False otherwise.
+    &#34;&#34;&#34;
+    return all([(x[feature] &gt;= lower) &amp; (x[feature] &lt; upper)] for feature, (lower, upper) in rule)</code></pre>
+</details>
+</dd>
+<dt id="evaluators.validate"><code class="name flex">
+<span>def <span class="ident">validate</span></span>(<span>rules, scores, oracle, vl, scoring='rrs', evaluator=None, alpha=0, beta=0, gamma=-1, max_len=inf)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Validate the given rules in the given ruleset.</p>
+<h2 id="arguments">Arguments</h2>
+<p>rules (iterable): Iterable of rules to validate.
+scores(iterable): The scores.
+oracle (Predictor): Oracle to validate against.
+vl (np.array): Validation set.
+scoring (str): Scoring function used.
+evaluator (Evaluator): Evaluator.
+alpha (float): Pruning hyperparameter, rules with score less than <code>alpha</code> are removed from the ruleset used to
+perform the validation.
+beta (float): Pruning hyperparameter, rules with score less than the <code>beta</code>-percentile are removed from the
+result.
+gamma (int): Maximum number of rules to use.
+max_len (int): Pruning hyperparameter, rules with length
+more than <code>max_len</code> are removed from the
+ruleset used to perform the validation.</p>
+<h2 id="returns">Returns</h2>
+<p>(dict): Dictionary of validation measures.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate(rules, scores, oracle, vl, scoring=&#39;rrs&#39;, evaluator=None, alpha=0, beta=0, gamma=-1, max_len=np.inf):
+    &#34;&#34;&#34;Validate the given rules in the given ruleset.
+    Arguments:
+        rules (iterable): Iterable of rules to validate.
+        scores(iterable): The scores.
+        oracle (Predictor): Oracle to validate against.
+        vl (np.array): Validation set.
+        scoring (str): Scoring function used.
+        evaluator (Evaluator): Evaluator.
+        alpha (float): Pruning hyperparameter, rules with score less than `alpha` are removed from the ruleset used to
+                        perform the validation.
+        beta (float): Pruning hyperparameter, rules with score less than the `beta`-percentile are removed from the
+                        result.
+        gamma (int): Maximum number of rules to use.
+        max_len (int): Pruning hyperparameter, rules with length
+                        more than `max_len` are removed from the
+                        ruleset used to perform the validation.
+    Returns:
+        (dict): Dictionary of validation measures.
+    &#34;&#34;&#34;
+    def mean_len(rules):
+        return np.mean([len(r) for r in rules])
+
+    def std_len(rules):
+        return np.std([len(r) for r in rules])
+
+    def len_reduction(ruleset_a, ruleset_b):
+        return ruleset_a / ruleset_b
+
+    def simplicity(ruleset_a, ruleset_b):
+        return ruleset_a * ruleset_b
+
+    def features_frequencies(rules, features):
+        return [sum([1 if f in r else 0 for r in rules]) for f in features]
+
+    def coverage_pct(rules, x):
+        coverage = coverage_matrix(rules, x)
+        coverage_percentage = (coverage.sum(axis=0) &gt; 0).sum() / x.shape[0]
+
+        return coverage_percentage
+
+    if evaluator is None:
+        evaluator = MemEvaluator(oracle=oracle)
+    if oracle is None:
+        x = vl[:, :-1]
+        y = vl[:, -1]
+    else:
+        x = vl[:, :-1]
+        y = oracle.predict(x).round().squeeze()
+
+    # Prune rules according to score and maximum length
+    majority_label = round(y.sum() / len(y))
+    n = len(rules)
+
+    beta_value = np.percentile(scores, beta)
+    beta_score_idx = [i for i in range(n) if scores[i] &gt;= beta_value and len(rules[i]) &lt;= max_len][:gamma]
+    beta_rules = [rules[i] for i in beta_score_idx]
+    beta_rules_nr = len(beta_rules)
+
+    alpha_score_idx = [i for i in range(n) if scores[i] &gt;= alpha and len(rules[i]) &lt;= max_len][:gamma]
+    alpha_rules = [rules[i] for i in alpha_score_idx]
+
+    validation = dict()
+    validation[&#39;alpha&#39;]     = alpha
+    validation[&#39;beta&#39;]      = beta
+    validation[&#39;gamma&#39;]     = gamma
+    validation[&#39;max_len&#39;]   = max_len
+    validation[&#39;scoring&#39;]   = scoring
+
+    scoring_fidelities = evaluator.binary_fidelity_model(alpha_rules, scores=scores,
+                                                                x=x, y=y, x_vl=x, y_vl=y,
+                                                                default=majority_label)
+    beta_scoring_fidelities = evaluator.binary_fidelity_model(beta_rules,
+                                                               scores=scores[beta_score_idx],
+                                                               x=x, y=y, x_vl=x, y_vl=y,
+                                                               default=majority_label)
+
+    validation[&#39;scoring-fidelities&#39;] = scoring_fidelities
+    validation[&#39;beta-scoring-fidelity&#39;] = beta_scoring_fidelities
+    validation[&#39;beta-scoring-rule_nr&#39;] = beta_rules_nr
+    validation[&#39;mean_length&#39;] = mean_len(rules)
+    validation[&#39;std_length&#39;] = std_len(rules)
+
+    validation[&#39;coverage&#39;] = coverage_pct(rules, x)
+    validation[&#39;beta-scoring-coverage&#39;] = coverage_pct(beta_rules, x)
+    validation[&#39;mean-beta-scoring-length&#39;] = mean_len(beta_rules)
+    validation[&#39;std-beta-scoring-length&#39;] = std_len(beta_rules)
+
+    # Predictions
+    validation[&#39;mean_prediction&#39;] = np.mean([r.consequence for r in rules])
+    validation[&#39;std-scoring-prediction&#39;] = np.std([r.consequence for r in alpha_rules])
+    validation[&#39;rule_reduction-alpha-scoring&#39;] = len(alpha_rules) / len(rules)
+    validation[&#39;rule_reduction-beta-scoring&#39;] = len(beta_rules) / len(rules)
+    validation[&#39;len_reduction-beta-scoring&#39;] = len_reduction(validation[&#39;mean-beta-scoring-length&#39;],
+                                                             validation[&#39;mean_length&#39;])
+    validation[&#39;simplicity-beta-scoring&#39;] = simplicity(validation[&#39;rule_reduction-beta-scoring&#39;],
+                                                       validation[&#39;len_reduction-beta-scoring&#39;])
+    features = rules[0].names
+    validation[&#39;feature_frequency&#39;]                 = features_frequencies(rules, features)
+    validation[&#39;scoring-beta-feature_frequency&#39;]    = features_frequencies(beta_rules, features)
+
+    validation[&#39;scoring-beta-escore&#39;] = harmonic_mean([validation[&#39;beta-scoring-fidelity&#39;],
+                                                        validation[&#39;simplicity-beta-scoring&#39;]])
+
+    return validation</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="evaluators.Evaluator"><code class="flex name class">
+<span>class <span class="ident">Evaluator</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Evaluator interface. Evaluator objects provide coverage and fidelity_weight utilities.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Evaluator:
+    &#34;&#34;&#34;Evaluator interface. Evaluator objects provide coverage and fidelity_weight utilities.&#34;&#34;&#34;
+
+    @abstractmethod
+    def coverage(self, rules, patterns, target=None, ids=None):
+        &#34;&#34;&#34;Compute the coverage of @rules over @patterns.
+        Args:
+            rules (list) or (Rule):
+            patterns (np.array): The validation set.
+            target (np.array): The labels, if any. None otherwise. Defaults to None.
+            ids (np.array): Unique identifiers to tell each element in @patterns apart.
+        Returns:
+            numpy.array: The coverage matrix.
+        &#34;&#34;&#34;
+        pass
+
+    @abstractmethod
+    def coverage_size(self, rule, x, ids=None):
+        &#34;&#34;&#34;Evaluate the cardinality of the coverage of unit on c.
+
+        Args:
+            rule (Rule): The rule.
+            x (np.array): The validation set.
+            ids (np.array): Unique identifiers to tell each element in @patterns apart.
+        Returns:
+            int: Number of records of X covered by rule.
+        &#34;&#34;&#34;
+        pass
+
+    @abstractmethod
+    def binary_fidelity(self, unit, x, y, ids=None, default=np.nan):
+        &#34;&#34;&#34;Evaluate the goodness of unit.
+        Args:
+            unit (Unit): The unit to evaluate.
+            x (np.array): The data.
+            y (np.array): The labels.
+            ids (np.array): Unique identifiers to tell each element in @patterns apart.
+            default (int): Default prediction when no rule covers a record.
+        Returns:
+              float: The unit&#39;s fidelity_weight
+        &#34;&#34;&#34;
+        pass
+
+    @abstractmethod
+    def binary_fidelity_model(self, rules, scores, x, y, x_vl, y_vl, default=None, ids=None):
+        &#34;&#34;&#34;Evaluate the goodness of the `units`.
+        Args:
+            rules (Union(list, set)): The units to evaluate.
+            scores (np.array): The scores.
+            x (np.array): The training data.
+            y (np.array): The training labels.
+            x_vl (np.array): The data.
+            y_vl (np.array): The labels.
+            default (int): Default prediction for records not covered by the unit.
+            ids (np.array): Unique identifiers to tell each element in @c apart.
+        Returns:
+            float: The units fidelity_weight.
+        &#34;&#34;&#34;
+        pass
+
+    @abstractmethod
+    def covers(self, rule, x):
+        &#34;&#34;&#34;Does @rule cover c?
+
+        Args:
+            rule (Rule): The rule.
+            x (np.array): The record.
+        Returns:
+            bool: True if this rule covers c, False otherwise.
+        &#34;&#34;&#34;
+        pass</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="evaluators.MemEvaluator" href="#evaluators.MemEvaluator">MemEvaluator</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="evaluators.Evaluator.binary_fidelity"><code class="name flex">
+<span>def <span class="ident">binary_fidelity</span></span>(<span>self, unit, x, y, ids=None, default=nan)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Evaluate the goodness of unit.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>unit</code></strong> :&ensp;<code>Unit</code></dt>
+<dd>The unit to evaluate.</dd>
+<dt><strong><code>x</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The data.</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The labels.</dd>
+<dt><strong><code>ids</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>Unique identifiers to tell each element in @patterns apart.</dd>
+<dt><strong><code>default</code></strong> :&ensp;<code>int</code></dt>
+<dd>Default prediction when no rule covers a record.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>float</code></dt>
+<dd>The unit's fidelity_weight</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@abstractmethod
+def binary_fidelity(self, unit, x, y, ids=None, default=np.nan):
+    &#34;&#34;&#34;Evaluate the goodness of unit.
+    Args:
+        unit (Unit): The unit to evaluate.
+        x (np.array): The data.
+        y (np.array): The labels.
+        ids (np.array): Unique identifiers to tell each element in @patterns apart.
+        default (int): Default prediction when no rule covers a record.
+    Returns:
+          float: The unit&#39;s fidelity_weight
+    &#34;&#34;&#34;
+    pass</code></pre>
+</details>
+</dd>
+<dt id="evaluators.Evaluator.binary_fidelity_model"><code class="name flex">
+<span>def <span class="ident">binary_fidelity_model</span></span>(<span>self, rules, scores, x, y, x_vl, y_vl, default=None, ids=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Evaluate the goodness of the <code>units</code>.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt>rules (Union(list, set)): The units to evaluate.</dt>
+<dt><strong><code>scores</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The scores.</dd>
+<dt><strong><code>x</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The training data.</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The training labels.</dd>
+<dt><strong><code>x_vl</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The data.</dd>
+<dt><strong><code>y_vl</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The labels.</dd>
+<dt><strong><code>default</code></strong> :&ensp;<code>int</code></dt>
+<dd>Default prediction for records not covered by the unit.</dd>
+<dt><strong><code>ids</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>Unique identifiers to tell each element in @c apart.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>float</code></dt>
+<dd>The units fidelity_weight.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@abstractmethod
+def binary_fidelity_model(self, rules, scores, x, y, x_vl, y_vl, default=None, ids=None):
+    &#34;&#34;&#34;Evaluate the goodness of the `units`.
+    Args:
+        rules (Union(list, set)): The units to evaluate.
+        scores (np.array): The scores.
+        x (np.array): The training data.
+        y (np.array): The training labels.
+        x_vl (np.array): The data.
+        y_vl (np.array): The labels.
+        default (int): Default prediction for records not covered by the unit.
+        ids (np.array): Unique identifiers to tell each element in @c apart.
+    Returns:
+        float: The units fidelity_weight.
+    &#34;&#34;&#34;
+    pass</code></pre>
+</details>
+</dd>
+<dt id="evaluators.Evaluator.coverage"><code class="name flex">
+<span>def <span class="ident">coverage</span></span>(<span>self, rules, patterns, target=None, ids=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the coverage of @rules over @patterns.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt>rules (list) or (Rule):</dt>
+<dt><strong><code>patterns</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The validation set.</dd>
+<dt><strong><code>target</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The labels, if any. None otherwise. Defaults to None.</dd>
+<dt><strong><code>ids</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>Unique identifiers to tell each element in @patterns apart.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>numpy.array</code></dt>
+<dd>The coverage matrix.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@abstractmethod
+def coverage(self, rules, patterns, target=None, ids=None):
+    &#34;&#34;&#34;Compute the coverage of @rules over @patterns.
+    Args:
+        rules (list) or (Rule):
+        patterns (np.array): The validation set.
+        target (np.array): The labels, if any. None otherwise. Defaults to None.
+        ids (np.array): Unique identifiers to tell each element in @patterns apart.
+    Returns:
+        numpy.array: The coverage matrix.
+    &#34;&#34;&#34;
+    pass</code></pre>
+</details>
+</dd>
+<dt id="evaluators.Evaluator.coverage_size"><code class="name flex">
+<span>def <span class="ident">coverage_size</span></span>(<span>self, rule, x, ids=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Evaluate the cardinality of the coverage of unit on c.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>rule</code></strong> :&ensp;<code>Rule</code></dt>
+<dd>The rule.</dd>
+<dt><strong><code>x</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The validation set.</dd>
+<dt><strong><code>ids</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>Unique identifiers to tell each element in @patterns apart.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>Number of records of X covered by rule.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@abstractmethod
+def coverage_size(self, rule, x, ids=None):
+    &#34;&#34;&#34;Evaluate the cardinality of the coverage of unit on c.
+
+    Args:
+        rule (Rule): The rule.
+        x (np.array): The validation set.
+        ids (np.array): Unique identifiers to tell each element in @patterns apart.
+    Returns:
+        int: Number of records of X covered by rule.
+    &#34;&#34;&#34;
+    pass</code></pre>
+</details>
+</dd>
+<dt id="evaluators.Evaluator.covers"><code class="name flex">
+<span>def <span class="ident">covers</span></span>(<span>self, rule, x)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Does @rule cover c?</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>rule</code></strong> :&ensp;<code>Rule</code></dt>
+<dd>The rule.</dd>
+<dt><strong><code>x</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The record.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>True if this rule covers c, False otherwise.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@abstractmethod
+def covers(self, rule, x):
+    &#34;&#34;&#34;Does @rule cover c?
+
+    Args:
+        rule (Rule): The rule.
+        x (np.array): The record.
+    Returns:
+        bool: True if this rule covers c, False otherwise.
+    &#34;&#34;&#34;
+    pass</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="evaluators.MemEvaluator"><code class="flex name class">
+<span>class <span class="ident">MemEvaluator</span></span>
+<span>(</span><span>oracle)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Memoization-aware Evaluator to avoid evaluating the same measures over the same data.</p>
+<p>Constructor.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class MemEvaluator(Evaluator):
+    &#34;&#34;&#34;Memoization-aware Evaluator to avoid evaluating the same measures over the same data.&#34;&#34;&#34;
+
+    def __init__(self, oracle):
+        &#34;&#34;&#34;Constructor.&#34;&#34;&#34;
+        self.oracle = oracle
+        self.coverages = dict()
+        self.binary_fidelities = dict()
+        self.coverage_sizes = dict()
+        self.scores = dict()
+
+    @abstractmethod
+    def covers(self, rule, x):
+        &#34;&#34;&#34;Does @rule cover c?
+
+        Args:
+            rule (Rule): The rule.
+            x (np.array): The record.
+        Returns:
+            bool: True if this rule covers c, False otherwise.
+        &#34;&#34;&#34;
+        return covers(rule, x)
+
+    def coverage(self, rules, x, y=None, ids=None):
+        &#34;&#34;&#34;Compute the coverage of @rules over @patterns.
+        Args:
+            rules (Union(Rule, list): Rule (or list of rules) whose coverage to compute.
+            x (np.array): The validation set.
+            y (np.array): The labels, if any. None otherwise. Defaults to None.
+            ids (np.array): IDS of the given `patterns`, used to speed up evaluation.
+        Returns:
+            numpy.np.array: The coverage matrix.
+        &#34;&#34;&#34;
+        for rule in rules:
+            if rule not in self.coverages:
+                self.coverages[rule] = coverage_matrix(rule, x, y)
+        cov = np.array([self.coverages[rule] for rule in rules])
+        cov = cov[:, ids] if ids is not None else cov
+
+        return cov
+
+    def binary_fidelity(self, unit, x, y, default=np.nan, ids=None):
+        &#34;&#34;&#34;Evaluate the goodness of unit.
+        Args:
+            unit (Unit): The unit to evaluate.
+            x (np.array): The data.
+            y (np.array): The labels.
+            default (int): Default prediction for records not covered by the unit.
+            ids (np.array): IDS of the given `x`, used to speed up evaluation.
+        Returns:
+              float: The unit&#39;s fidelity_weight
+        &#34;&#34;&#34;
+        if y is None:
+            y = self.oracle.predict(x).round().squeeze()
+
+        if ids is None:
+            self.binary_fidelities[unit] = self.binary_fidelities.get(unit, binary_fidelity(unit, x, y, self,
+                                                                                            default=default, ids=None))
+            fidelity = self.binary_fidelities[unit]
+        else:
+            fidelity = binary_fidelity(unit, x, y, self, default=default, ids=ids)
+
+        return fidelity
+
+    def binary_fidelity_model(self, rules, scores, x, y, x_vl, y_vl, default=None, ids=None):
+        &#34;&#34;&#34;Evaluate the goodness of unit.
+        Args:
+            rules (np.array): The units to evaluate.
+            scores (np.array): The scores.
+            x (np.array): The data.
+            y (np.array): The labels.
+            x_vl (np.array): The validation data.
+            y_vl (np.array): The validation labels.
+            default (int): Default prediction for records not covered by the unit.
+            ids (np.array): Unique identifiers to tell each element in @patterns apart.
+        Returns:
+              (float): The units fidelity.
+        &#34;&#34;&#34;
+        if self.oracle is not None:
+            y_vl = self.oracle.predict(x_vl).round().squeeze()
+
+        coverage = self.coverage(rules, x_vl, y_vl)
+
+        predictions = []
+        for record in range(len(x_vl)):
+            companions = scores[coverage[:, record]]
+            companion_units = [rules[i] for i in coverage[:, record]]
+            top_companions = np.argsort(companions)[-1:]
+            top_units = [companion_units[i] for i in top_companions]
+            top_fidelities = companions[top_companions]
+            top_fidelities_0 = [top_fidelity for top_fidelity, top_unit in zip(top_fidelities, top_units)
+                                if top_unit.consequence == 0]
+            top_fidelities_1 = [top_fidelity for top_fidelity, top_unit in zip(top_fidelities, top_units)
+                                if top_unit.consequence == 1]
+
+            if len(top_fidelities_0) == 0 and len(top_fidelities_1) &gt; 0:
+                prediction = 1
+            elif len(top_fidelities_0) &gt; 0 and len(top_fidelities_1) == 0:
+                prediction = 0
+            elif len(top_fidelities_0) == 0 and len(top_fidelities_1) == 0:
+                prediction = default
+            else:
+                prediction = 0 if np.mean(top_fidelities_0) &gt; np.mean(top_fidelities_1) else 1
+
+            predictions.append(prediction)
+        predictions = np.array(predictions)
+        fidelity = 1 - hamming(predictions, y_vl) if len(y_vl) &gt; 0 else 0
+
+        return fidelity</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="evaluators.Evaluator" href="#evaluators.Evaluator">Evaluator</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="evaluators.MemEvaluator.binary_fidelity"><code class="name flex">
+<span>def <span class="ident">binary_fidelity</span></span>(<span>self, unit, x, y, default=nan, ids=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Evaluate the goodness of unit.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>unit</code></strong> :&ensp;<code>Unit</code></dt>
+<dd>The unit to evaluate.</dd>
+<dt><strong><code>x</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The data.</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The labels.</dd>
+<dt><strong><code>default</code></strong> :&ensp;<code>int</code></dt>
+<dd>Default prediction for records not covered by the unit.</dd>
+<dt><strong><code>ids</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>IDS of the given <code>x</code>, used to speed up evaluation.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>float</code></dt>
+<dd>The unit's fidelity_weight</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def binary_fidelity(self, unit, x, y, default=np.nan, ids=None):
+    &#34;&#34;&#34;Evaluate the goodness of unit.
+    Args:
+        unit (Unit): The unit to evaluate.
+        x (np.array): The data.
+        y (np.array): The labels.
+        default (int): Default prediction for records not covered by the unit.
+        ids (np.array): IDS of the given `x`, used to speed up evaluation.
+    Returns:
+          float: The unit&#39;s fidelity_weight
+    &#34;&#34;&#34;
+    if y is None:
+        y = self.oracle.predict(x).round().squeeze()
+
+    if ids is None:
+        self.binary_fidelities[unit] = self.binary_fidelities.get(unit, binary_fidelity(unit, x, y, self,
+                                                                                        default=default, ids=None))
+        fidelity = self.binary_fidelities[unit]
+    else:
+        fidelity = binary_fidelity(unit, x, y, self, default=default, ids=ids)
+
+    return fidelity</code></pre>
+</details>
+</dd>
+<dt id="evaluators.MemEvaluator.binary_fidelity_model"><code class="name flex">
+<span>def <span class="ident">binary_fidelity_model</span></span>(<span>self, rules, scores, x, y, x_vl, y_vl, default=None, ids=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Evaluate the goodness of unit.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>rules</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The units to evaluate.</dd>
+<dt><strong><code>scores</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The scores.</dd>
+<dt><strong><code>x</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The data.</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The labels.</dd>
+<dt><strong><code>x_vl</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The validation data.</dd>
+<dt><strong><code>y_vl</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The validation labels.</dd>
+<dt><strong><code>default</code></strong> :&ensp;<code>int</code></dt>
+<dd>Default prediction for records not covered by the unit.</dd>
+<dt><strong><code>ids</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>Unique identifiers to tell each element in @patterns apart.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>(float): The units fidelity.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def binary_fidelity_model(self, rules, scores, x, y, x_vl, y_vl, default=None, ids=None):
+    &#34;&#34;&#34;Evaluate the goodness of unit.
+    Args:
+        rules (np.array): The units to evaluate.
+        scores (np.array): The scores.
+        x (np.array): The data.
+        y (np.array): The labels.
+        x_vl (np.array): The validation data.
+        y_vl (np.array): The validation labels.
+        default (int): Default prediction for records not covered by the unit.
+        ids (np.array): Unique identifiers to tell each element in @patterns apart.
+    Returns:
+          (float): The units fidelity.
+    &#34;&#34;&#34;
+    if self.oracle is not None:
+        y_vl = self.oracle.predict(x_vl).round().squeeze()
+
+    coverage = self.coverage(rules, x_vl, y_vl)
+
+    predictions = []
+    for record in range(len(x_vl)):
+        companions = scores[coverage[:, record]]
+        companion_units = [rules[i] for i in coverage[:, record]]
+        top_companions = np.argsort(companions)[-1:]
+        top_units = [companion_units[i] for i in top_companions]
+        top_fidelities = companions[top_companions]
+        top_fidelities_0 = [top_fidelity for top_fidelity, top_unit in zip(top_fidelities, top_units)
+                            if top_unit.consequence == 0]
+        top_fidelities_1 = [top_fidelity for top_fidelity, top_unit in zip(top_fidelities, top_units)
+                            if top_unit.consequence == 1]
+
+        if len(top_fidelities_0) == 0 and len(top_fidelities_1) &gt; 0:
+            prediction = 1
+        elif len(top_fidelities_0) &gt; 0 and len(top_fidelities_1) == 0:
+            prediction = 0
+        elif len(top_fidelities_0) == 0 and len(top_fidelities_1) == 0:
+            prediction = default
+        else:
+            prediction = 0 if np.mean(top_fidelities_0) &gt; np.mean(top_fidelities_1) else 1
+
+        predictions.append(prediction)
+    predictions = np.array(predictions)
+    fidelity = 1 - hamming(predictions, y_vl) if len(y_vl) &gt; 0 else 0
+
+    return fidelity</code></pre>
+</details>
+</dd>
+<dt id="evaluators.MemEvaluator.coverage"><code class="name flex">
+<span>def <span class="ident">coverage</span></span>(<span>self, rules, x, y=None, ids=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the coverage of @rules over @patterns.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt>rules (Union(Rule, list): Rule (or list of rules) whose coverage to compute.</dt>
+<dt><strong><code>x</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The validation set.</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>The labels, if any. None otherwise. Defaults to None.</dd>
+<dt><strong><code>ids</code></strong> :&ensp;<code>np.array</code></dt>
+<dd>IDS of the given <code>patterns</code>, used to speed up evaluation.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>numpy.np.array</code></dt>
+<dd>The coverage matrix.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def coverage(self, rules, x, y=None, ids=None):
+    &#34;&#34;&#34;Compute the coverage of @rules over @patterns.
+    Args:
+        rules (Union(Rule, list): Rule (or list of rules) whose coverage to compute.
+        x (np.array): The validation set.
+        y (np.array): The labels, if any. None otherwise. Defaults to None.
+        ids (np.array): IDS of the given `patterns`, used to speed up evaluation.
+    Returns:
+        numpy.np.array: The coverage matrix.
+    &#34;&#34;&#34;
+    for rule in rules:
+        if rule not in self.coverages:
+            self.coverages[rule] = coverage_matrix(rule, x, y)
+    cov = np.array([self.coverages[rule] for rule in rules])
+    cov = cov[:, ids] if ids is not None else cov
+
+    return cov</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="evaluators.Evaluator" href="#evaluators.Evaluator">Evaluator</a></b></code>:
+<ul class="hlist">
+<li><code><a title="evaluators.Evaluator.coverage_size" href="#evaluators.Evaluator.coverage_size">coverage_size</a></code></li>
+<li><code><a title="evaluators.Evaluator.covers" href="#evaluators.Evaluator.covers">covers</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="evaluators.binary_fidelity" href="#evaluators.binary_fidelity">binary_fidelity</a></code></li>
+<li><code><a title="evaluators.coverage_matrix" href="#evaluators.coverage_matrix">coverage_matrix</a></code></li>
+<li><code><a title="evaluators.coverage_size" href="#evaluators.coverage_size">coverage_size</a></code></li>
+<li><code><a title="evaluators.covers" href="#evaluators.covers">covers</a></code></li>
+<li><code><a title="evaluators.validate" href="#evaluators.validate">validate</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="evaluators.Evaluator" href="#evaluators.Evaluator">Evaluator</a></code></h4>
+<ul class="">
+<li><code><a title="evaluators.Evaluator.binary_fidelity" href="#evaluators.Evaluator.binary_fidelity">binary_fidelity</a></code></li>
+<li><code><a title="evaluators.Evaluator.binary_fidelity_model" href="#evaluators.Evaluator.binary_fidelity_model">binary_fidelity_model</a></code></li>
+<li><code><a title="evaluators.Evaluator.coverage" href="#evaluators.Evaluator.coverage">coverage</a></code></li>
+<li><code><a title="evaluators.Evaluator.coverage_size" href="#evaluators.Evaluator.coverage_size">coverage_size</a></code></li>
+<li><code><a title="evaluators.Evaluator.covers" href="#evaluators.Evaluator.covers">covers</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="evaluators.MemEvaluator" href="#evaluators.MemEvaluator">MemEvaluator</a></code></h4>
+<ul class="">
+<li><code><a title="evaluators.MemEvaluator.binary_fidelity" href="#evaluators.MemEvaluator.binary_fidelity">binary_fidelity</a></code></li>
+<li><code><a title="evaluators.MemEvaluator.binary_fidelity_model" href="#evaluators.MemEvaluator.binary_fidelity_model">binary_fidelity_model</a></code></li>
+<li><code><a title="evaluators.MemEvaluator.coverage" href="#evaluators.MemEvaluator.coverage">coverage</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
+</footer>
+</body>
+</html>

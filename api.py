@@ -9,94 +9,81 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import click
 import logzero
-from numpy import genfromtxt, argwhere, array, inf, hstack
-import tensorflow as tf
-from keras.models import load_model
+from numpy import genfromtxt, inf, hstack, float as np_float
+from tensorflow.keras.models import load_model
 
 from logzero import logger
 
 from models import Rule
-from measures import Scorer
-from eval import MemEvaluator, validate
-
-tf.logging.set_verbosity(tf.logging.ERROR)
+from scoring import Scorer
+from evaluators import MemEvaluator, validate
 
 
-class DummyOracle:
-    """Dummy oracle, just repeats what has been given, majority vote otherwise."""
+def pretty_print_results(results, dump_file):
+    logger.info('-------------------------------------------------------')
+    logger.info('Results stored in ' + dump_file)
+    logger.info('alpha: '                                               + str(results['alpha']))
+    logger.info('beta: '                                                + str(results['beta']))
+    logger.info('gamma: '                                               + str(results['gamma']))
+    logger.info('max_len: '                                             + str(results['max_len']))
+    logger.info('score function: '                                      + str(results['scoring']))
+    logger.info('[ALPHA-pruned ruleset] fidelity: '                     + str(results['scoring-fidelities']))
+    logger.info('[BETA-pruned ruleset] fidelity: '                      + str(results['beta-scoring-fidelity']))
+    logger.info('[BETA-pruned ruleset] #rules: '                        + str(results['beta-scoring-rule_nr']))
+    logger.info('[BETA-pruned ruleset] coverage: '                      + str(100 * results['beta-scoring-coverage']) + '%')
+    logger.info('[BETA-pruned ruleset] mean rule length: '              + str(results['mean-beta-scoring-length']))
+    logger.info('[BETA-pruned ruleset] std rule length: '               + str(results['std-beta-scoring-length']))
+    logger.info('[BETA-pruned ruleset] #rules reduction:'               + str(100 * results['rule_reduction-beta-scoring']) + '%')
+    logger.info('[BETA-pruned ruleset] mean length reduction:'          + str(100 * results['len_reduction-beta-scoring']) + '%')
+    logger.info('[BETA-pruned ruleset] explainability score:'           + str(results['simplicity-beta-scoring']))
 
-    def __init__(self, data):
-        """Constructor."""
-        self.x = data[:, :-1]
-        self.y = data[:, -1]
-        self.majority_vote = int(.5 + self.y.sum() / self.y.shape[0])
-
-    def predict(self, x):
-        """Predict x, nan if unknown at construction time."""
-        predictions = list()
-        for x_ in x:
-            idx = argwhere((self.x == x_).all(axis=1))
-
-            if len(idx) > 0:
-                predictions.append(self.y[idx.item(0)])
-            else:
-                predictions.append(self.majority_vote)
-        predictions = array(predictions)
-
-        return predictions
 
 @click.command()
 @click.argument('rules',            type=click.Path(exists=True))
 @click.argument('tr',               type=click.Path(exists=True))
-@click.argument('vl',               type=click.Path(exists=True))
-@click.option('-o', '--oracle',     default=None)
+@click.option('-vl',                default=None,                   help='Validation set, if any.')
+@click.option('-o', '--oracle',     default=None,                   help='Black box to predict the dataset labels, if'
+                                                                         ' any. Otherwise use the dataset labels.')
 @click.option('-m', '--name',       default=None,                   help='Name of the log files.')
-@click.option('-s', '--score',      default='r2',                   help='Scoring function to use.'
-                                                                        'Available functions are \'r2\''
+@click.option('-s', '--score',      default='rrs',                  help='Scoring function to use.'
+                                                                        'Available functions are \'rrs\''
                                                                         ' (which includes fidelity scoring)'
                                                                         ' and \'coverage\'.'
-                                                                        'Defaults to r2.')
+                                                                        'Defaults to rrs.')
 @click.option('-p', '--wp',         default=1.,                     help='Coverage weight. Defaults to 1.')
 @click.option('-p', '--ws',         default=1.,                     help='Sparsity weight. Defaults to 1.')
 @click.option('-a', '--alpha',      default=0.,                     help='Score pruning in [0, 1]. '
-                                                                     'Defaults to 0 (no pruning).')
-@click.option('-b', '--beta',       default=0.,                     help='Score percentile pruning in [0, 1]. '
+                                                                         'Defaults to 0 (no pruning).')
+@click.option('-b', '--beta',       default=0.,                     help='Prune the rules under the beta-th percentile.'
                                                                         'Defaults to 0 (no pruning).')
 @click.option('-g', '--gamma',      default=-1.,                    help='Maximum number of rules (>0) to use. '
                                                                         'Defaults to -1 use all.')
 @click.option('-l', '--max_len',    default=-1.,                    help='Length pruning in [0, inf]. '
                                                                          'Defaults to -1 (no pruning).')
-@click.option('-k', '--k',          default=1,                      help='Number of rules to use at prediction time. '
-                                                                         'Defaults to 1.')
 @click.option('-d', '--debug',      default=20,                     help='Debug level.')
-def cl_run(rules, oracle, tr, vl, name, score='r2', wp=1., ws=1., alpha=0, beta=0, gamma=-1, max_len=-1, k=1, debug=20):
-    run(rules, score, name, oracle, tr, vl, wp=wp, ws=ws, alpha=alpha, beta=beta, gamma=gamma, max_len=max_len, k=k,
-        debug=debug)
+def cl_run(rules, tr, vl, oracle, name, score='rrs', wp=1., ws=1., alpha=0, beta=0, gamma=-1, max_len=-1, debug=20):
+    run(rules, score, name, oracle, tr, vl, coverage_weight=wp, sparsity_weight=ws, alpha=alpha, beta=beta, gamma=gamma,
+        max_len=max_len, debug=debug)
 
 
-def run(rules, scoring='r2', name=None, oracle=None, tr=None, vl=None, wp=1., ws=1., alpha=0, beta=0, gamma=-1, max_len=-1, k=1, debug=20):
+def run(rules, scoring='rrs', name=None, oracle=None, tr=None, vl=None, coverage_weight=1., sparsity_weight=1.,
+        alpha=0, beta=0, gamma=-1, max_len=-1, debug=20):
     """Run the Scoring framework on a set of rules.
     Arguments:
         rules (str): JSON file with the train set.
-        scoring (str): Type of scoring to perform. Available
-                        names are 'r2', which includes fidelity scoring,
-                        and 'coverage'. Defaults to 'r2'.
+        scoring (str): Type of scoring to perform. Available names are 'rrs', which includes fidelity scoring, and
+                        'coverage'. Defaults to 'rrs'.
         oracle (Union(str, None)): Oracle to score against.
         tr (str): Training set.
-        vl (str): Validation set.
+        vl (str): Validation set, if any.
         name (str): Name for the output logs.
-        wp (float): Coverage weight vector.
-        ws (float): Sparsity weight vector.
-        alpha (float): Pruning hyperparameter, rules with score
-                        less than `alpha` are removed from the
-                        result.
-        beta (float): Pruning hyperparameter, rules with score
-                        less than the `beta`-percentile are removed from the
+        coverage_weight (float): Coverage weight vector.
+        sparsity_weight (float): Sparsity weight vector.
+        alpha (float): Pruning hyperparameter, rules with score less than `alpha` are removed from the result.
+        beta (float): Pruning hyperparameter, rules with score less than the `beta`-percentile are removed from the
                         result.
         gamma (int): Maximum number of rules to use.
-        max_len (int): Pruning hyperparameter, rules with length
-                        more than `max_len` are removed from the
-                        result.
+        max_len (int): Pruning hyperparameter, rules with length more than `max_len` are removed from the result.
         debug (int): Minimum debug level.
     """
     # Set-up debug
@@ -116,33 +103,37 @@ def run(rules, scoring='r2', name=None, oracle=None, tr=None, vl=None, wp=1., ws
     logzero.loglevel(min_log)
 
     if name is None:
-        name = str(time.time())
+        name = tr + str(time.time())
 
     # Info LOG
-    logger.info('Rules: '   + str(rules))
-    logger.info('name: '    + str(name))
-    logger.info('score: '   + str(scoring))
-    logger.info('k: '       + str(k))
-    logger.info('oracle: '  + str(oracle))
-    logger.info('vl: '      + str(vl))
-    logger.info('wp: '      + str(wp))
-    logger.info('ws: '      + str(ws))
-    logger.info('alpha: '   + str(alpha))
-    logger.info('beta: '    + str(beta))
-    logger.info('max len: ' + str(max_len))
+    logger.info('Rules: '           + str(rules))
+    logger.info('name: '            + str(name))
+    logger.info('score: '           + str(scoring))
+    logger.info('oracle: '          + str(oracle))
+    logger.info('vl: '              + str(vl))
+    logger.info('coverage weight: ' + str(coverage_weight))
+    logger.info('sparsity weight: ' + str(sparsity_weight))
+    logger.info('alpha: '           + str(alpha))
+    logger.info('beta: '            + str(beta))
+    logger.info('max len: '         + str(max_len))
 
     logger.info('Loading validation... ')
-    tr_set = genfromtxt(tr, delimiter=',')
-    validation_set = genfromtxt(vl, delimiter=',')
+    data = genfromtxt(tr, delimiter=',', names=True)
+    names = data.dtype.names
+    training_set = data.view(np_float).reshape(data.shape + (-1,))
+    if vl is not None:
+        data = genfromtxt(vl, delimiter=',', names=True)
+        validation_set = data.view(np_float).reshape(data.shape + (-1,))
+    else:
+        validation_set = None
 
     # Run Scoring
     logger.info('Loading ruleset...')
-    rules = Rule.from_json(rules)
+    rules = Rule.from_json(rules, names)
     rules = [r for r in rules if len(r) > 0]
 
     logger.info('Loading oracle...')
     if oracle is not None:
-        oracle_name = oracle.split('.')[0]
         if oracle.endswith('.h5'):
             oracle = load_model(oracle)
         elif oracle.endswith('.pickle'):
@@ -150,17 +141,18 @@ def run(rules, scoring='r2', name=None, oracle=None, tr=None, vl=None, wp=1., ws
                 oracle = pickle.load(log)
         else:
             return
-        validation_set = hstack((validation_set[:, :-1],
-                                 oracle.predict(validation_set[:, :-1].round()).reshape((validation_set.shape[0], 1))))
-        tr_set = hstack((tr_set[:, :-1],
-                         oracle.predict(tr_set[:, :-1].round()).reshape((tr_set.shape[0], 1))))
+        if validation_set is not None:
+            validation_set = hstack((validation_set[:, :-1],
+                                     oracle.predict(validation_set[:, :-1].round()).reshape((validation_set.shape[0], 1))))
+        training_set = hstack((training_set[:, :-1],
+                               oracle.predict(training_set[:, :-1].round()).reshape((training_set.shape[0], 1))))
 
     logger.info('Creating scorer...')
     evaluator = MemEvaluator(oracle=oracle)
-    scorer = Scorer(score=scoring, evaluator=evaluator, oracle=oracle, wp=wp, ws=ws)
+    scorer = Scorer(score=scoring, evaluator=evaluator, oracle=oracle)
 
     logger.info('Scoring...')
-    scores = scorer.score(rules, tr_set, wp, ws)
+    scores = scorer.score(rules, training_set, coverage_weight, sparsity_weight)
 
     logger.info('Storing scores...')
     storage_file = name + '.csv'
@@ -168,14 +160,15 @@ def run(rules, scoring='r2', name=None, oracle=None, tr=None, vl=None, wp=1., ws
 
     # Validation
     logger.info('Validating...')
-    evaluator = MemEvaluator(oracle=oracle)
-    validation_dic = validate(rules, scores, oracle, validation_set, evaluator, alpha=alpha, beta=beta,
+    validation_dic = validate(rules, scores, oracle=oracle,
+                              vl=validation_set if validation_set is not None else training_set,
+                              scoring=scoring,
+                              alpha=alpha, beta=beta,
                               gamma=len(rules) if gamma < 0 else int(gamma),
-                              max_len=inf if max_len <= 0 else max_len, k=k, debug=debug)
-    validation_dic['coverage'] = wp
-    validation_dic['sparsity'] = ws
+                              max_len=inf if max_len <= 0 else max_len)
+    validation_dic['coverage'] = coverage_weight
+    validation_dic['sparsity'] = sparsity_weight
     validation_dic['scoring'] = scoring
-    validation_dic['black_box'] = oracle_name if oracle is not None else ''
 
     # Store info on JSON
     out_str = name + '.results.json'
@@ -184,8 +177,8 @@ def run(rules, scoring='r2', name=None, oracle=None, tr=None, vl=None, wp=1., ws
             out_dic = json.load(log)
         out_dic['runs'].append({
                 'scoring': scoring,
-                'coverage': wp,
-                'sparsity': ws,
+                'coverage': coverage_weight,
+                'sparsity': sparsity_weight,
                 'alpha': alpha,
                 'beta': beta,
                 'gamma': gamma,
@@ -197,8 +190,8 @@ def run(rules, scoring='r2', name=None, oracle=None, tr=None, vl=None, wp=1., ws
             'name': name,
             'runs': [{
                 'scoring': scoring,
-                'coverage': wp,
-                'sparsity': ws,
+                'coverage': coverage_weight,
+                'sparsity': sparsity_weight,
                 'alpha': alpha,
                 'beta': beta,
                 'gamma': gamma,
@@ -208,7 +201,8 @@ def run(rules, scoring='r2', name=None, oracle=None, tr=None, vl=None, wp=1., ws
         }
     with open(out_str, 'w') as log:
         json.dump(out_dic, log)
-    logger.info('Done.')
+
+    pretty_print_results(validation_dic, out_str)
 
 
 if __name__ == '__main__':
